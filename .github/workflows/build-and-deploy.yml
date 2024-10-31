@@ -112,4 +112,5 @@ jobs:
           jf release-bundle-promote \
           rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }} STAGE \
           --signing-key="tomj-gpg-key" \
-          --included-repos=rlm-introduction-stage-local
+          --included-repos=rlm-introduction-stage-local \
+          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
