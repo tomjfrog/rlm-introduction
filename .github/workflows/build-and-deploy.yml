@@ -110,5 +110,5 @@ jobs:
         run: |
           jf release-bundle-create \
           --build=${{ github.repository }}/${{ github.run_number }} \
-          --signing-key=<foo>
+          --signing-key=tomj-signing-key
           ${{ github.repository }} ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
