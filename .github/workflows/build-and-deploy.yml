@@ -109,6 +109,16 @@ jobs:
       - name: Create Release Bundle
         run: |
           jf release-bundle-create \
-          --build=${{ github.repository }}/${{ github.run_number }} \
-          --signing-key=tomj-signing-key \
-          ${{ github.repository }} ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
+          --spec=.github/workflows/filespecs/release-bundle-spec.json \
+          --spec-vars="BUILD=${{ github.repository }}/${{ github.run_number }}" \
+          --signing-key=tomj-gpg-key \
+          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
+          
+          
+      - name: Promote Release Bundle to Dev
+        id: promote-release-bundle-to-dev
+        run: |
+          jf release-bundle-promote \
+          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }} STAGE \
+          --signing-key="tomj-gpg-key"
+          --included-repos=rlm-introduction-stage-local
