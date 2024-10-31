@@ -1,9 +1,0 @@
-{
-  "files": [
-    {
-      "target": "${TARGET_REPO}/",
-      "build": "${BUILD_NAME}/${BUILD_NUMBER}",
-      "includeDeps": "true"
-    }
-  ]
-}

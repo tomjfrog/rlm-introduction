@@ -1,9 +1,0 @@
-{
-  "files": [
-    {
-      "pattern": "*",
-      "target": "global-shared-maven-snapshot-local",
-      "build": "${BUILD}"
-    }
-  ]
-}

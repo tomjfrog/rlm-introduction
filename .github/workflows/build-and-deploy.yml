@@ -1,9 +1,7 @@
-name: Build and Publish Snapshot Artifact, Create Release Bundle
+name: Build, Publish, Bundle, Promote
 
 permissions:
   id-token: write
-
-
 
 on:
   workflow_dispatch:
@@ -12,14 +10,6 @@ on:
         description: 'Library SemVer'
         required: true
         default: '0.0.0'
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '.github/workflows/**'
-#  pull_request:
-#    branches:
-#      - main
 
 jobs:
   build:
@@ -112,7 +102,7 @@ jobs:
           --spec=.github/workflows/filespecs/release-bundle-spec.json \
           --spec-vars="BUILD=${{ github.repository }}/${{ github.run_number }}" \
           --signing-key=tomj-gpg-key \
-          --sync=true
+          --sync=true \
           rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
           
           
