@@ -90,11 +90,6 @@ jobs:
         run: |
           jf rt bp ${{ github.repository }} ${{ github.run_number }}
 
-      # Added this for an easy-to-query property on the artifacts produced by this build
-      - name: Set Properties on Published Artifacts
-        run: |
-          jf rt set-props commit_sha=${{ github.sha }} --build ${{ github.repository }}/${{ github.run_number }}
-
       # Create the Release Bundle
       - name: Create Release Bundle
         run: |
