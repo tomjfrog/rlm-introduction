@@ -67,8 +67,8 @@ jobs:
           --server-id-deploy=setup-jfrog-cli-server \
           --repo-resolve-releases=mavencentral-remote \
           --repo-resolve-snapshots=mavencentral-remote \
-          --repo-deploy-releases=rlm-introduction \
-          --repo-deploy-snapshots=rlm-introduction
+          --repo-deploy-releases=rlm-introduction-devl-local \
+          --repo-deploy-snapshots=rlm-introduction-devl-local
 
       # Fetch the abbreviated SHA of the HEAD pointer for passing to other steps
       - name: Get Abbreviated Commit SHA
