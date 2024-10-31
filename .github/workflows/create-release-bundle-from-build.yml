@@ -1,0 +1,118 @@
+name: Create Release Bundle & Promote to Dev
+
+permissions:
+  id-token: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: 'The number of the build to promote'
+        required: false
+        default: ''
+  push:
+    tags:
+      - '*-rc-[0-9]*'
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        id: setup-jfrog-cli
+        env:
+          JF_URL: ${{ vars.JF_URL }}
+          JF_PROJECT: "tomj-time-lib"
+        with:
+          oidc-provider-name: github-oidc-integration
+          oidc-audience: jfrog-github
+
+      # Find the JFrog Build-Info with the COMMIT_SHA that matches the Release Tag's COMMIT_SHA pointer.  This only works
+      # if there have been new commits on the Git repo that didn't result in a new artifact build-and-publish.  Most often,
+      # this will be due to updates to this Actions spec.
+#      - name: Find Build Associated with Release COMMIT_SHA
+#        if: ${{ inputs.build_name == '' && inputs.build_number == '' }}
+#        working-directory: .github/workflows
+#        id: find-build-by-commit
+#        run: |
+#          python3 find-build.py --commit_sha ${{ github.sha }} --access_token ${{ steps.setup-jfrog-cli.outputs.oidc-token }} > build-query-result.json
+#          build_name=$(jq -r '.results.build.name' build-query-result.json)
+#          build_number=$(jq -r 'results.build.number' build-query-result.json)
+#          echo "build_name=build_name" >> $GITHUB_OUTPUT
+#          echo "build_number=build_number" >> $GITHUB_OUTPUT
+
+      - name: Find Latest Build Number For Build Name
+        if: ${{ inputs.build_number == '' }}
+        id: latest-build
+        run: |
+          python3 .github/workflows/find-latest-build.py --build_name ${{ github.repository }} --access_token ${{ steps.setup-jfrog-cli.outputs.oidc-token }} > latest-build-response.json
+          cat latest-build-response.json
+          echo "build_number=$(jq -r '.results[0]["build.number"]' latest-build-response.json)" >> $GITHUB_OUTPUT
+          echo build_number
+
+      - name: Set Build Name and Build Number to Promote
+        id: set-build-info
+        run: |
+          # Check if inputs are provided, otherwise use outputs from previous step
+          echo "build_name=${{ github.repository }}" >> $GITHUB_OUTPUT
+          echo "build_number=${{ inputs.build_number != '' && inputs.build_number || steps.latest-build.outputs.build_number }}" >> $GITHUB_OUTPUT
+
+      # I'd like to include the dependencies in the Bundle, but I can't include dependencies that are only referenced in a remote repo, why?
+      - name: Query Build for Dependencies
+        id: get-build-dependencies
+        working-directory: .github/workflows
+        run: |
+          python3 find-build-dependencies.py --build_name ${{ github.repository }} --build_number ${{ steps.set-build-info.outputs.build_number }} --access_token ${{ steps.setup-jfrog-cli.outputs.oidc-token }} > dependency-query-result.json
+          cat dependency-query-result.json
+          dependency_list=$(jq '.results[].modules[].dependencies[]."dependency.name"' dependency-query-result.json)
+          echo "dependency_list=dependency_list" >> $GITHUB_OUTPUT
+
+      - name: Copy Dependencies to Local Repo
+        id: generate-local-search-pattern
+        working-directory: .github/workflows/filespecs
+        continue-on-error: true
+        run: |
+          jf rt cp \
+          --project=tomj-time-lib \
+          --spec=add-local-maven-repo-deps.json \
+          --spec-vars="TARGET_REPO=tomj-time-lib-dependencies-local;BUILD_NAME=${{ steps.set-build-info.outputs.build_name }};BUILD_NUMBER=${{ steps.set-build-info.outputs.build_number }}"
+
+      - name: Create Release Bundle
+        id: create-release-bundle
+        run: |
+          jf release-bundle-create \
+          tomj-time-lib ${{ github.run_number }} \
+          --spec=./.github/workflows/filespecs/release-bundle-spec.json \
+          --signing-key="tomj-gpg-key" \
+          --sync=true
+
+      # Promote the Release Bundle to Stage.  This will only promote it into the Project repos.  It appears that
+      # "including" a non-project repo will fail with a 400 error, claiming the non-project target is not assigned to
+      # the target Environment.  This is misleading error messaging and moreover, we would need to fix this or come up
+      # an alternative.
+      - name: Promote Release Bundle to Snapshot Repos
+        id: promote-release-bundle-to-snapshot
+        run: |
+          jf release-bundle-promote \
+          tomj-time-lib ${{ github.run_number }} STAGE \
+          --signing-key="tomj-gpg-key" \
+
+      # Since we can't promote into a non-project repo, and our use-case involves copying into Global Shared repos
+      # we will have to do a manual copy. This gets a little close to breaking the chain of custody of the RB, but
+      # It's what we have to work with right now.  The primary concern is what does this "loose" coupling represent in terms
+      # of breaking the relationship of the RB to the Artifact arriving in the Global Shared Local?
+      - name: Copy Promoted RB Artifact to Global Shared Local
+        id: copy-artifact-to-global-shared-local
+        continue-on-error: true
+        working-directory: .github/workflows/filespecs
+        run: |
+          jf rt cp \
+          --project=tomj-time-lib \
+          --spec=copy-to-global-shared.json \
+          --spec-vars="BUILD=${{ github.repository }}/${{ steps.set-build-info.outputs.build_number }};TARGET=global-shared-maven-snapshot-local" 
+          

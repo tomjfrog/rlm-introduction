@@ -1,0 +1,114 @@
+name: Build and Publish Snapshot Artifact, Create Release Bundle
+
+permissions:
+  id-token: write
+
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Library SemVer'
+        required: true
+        default: '0.0.0'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/workflows/**'
+#  pull_request:
+#    branches:
+#      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout specific commit
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.ref }}
+
+      # Set up JDK (Java Development Kit)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+
+      # Initialize the JFrog CLI for various steps in this workflow
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        id: setup-jfrog-cli
+        env:
+          JF_URL: ${{ vars.JF_URL }}
+        with:
+          oidc-provider-name: github-oidc-integration
+          oidc-audience: jfrog-github
+          disable-auto-build-publish: true
+
+      # Cache Maven dependencies for faster builds
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Configure Maven
+        shell: bash
+        run: |
+          jf mvnc \
+          --server-id-resolve=setup-jfrog-cli-server \
+          --server-id-deploy=setup-jfrog-cli-server \
+          --repo-resolve-releases=mavencentral-remote \
+          --repo-resolve-snapshots=mavencentral-remote \
+          --repo-deploy-releases=rlm-introduction \
+          --repo-deploy-snapshots=rlm-introduction
+
+      # Fetch the abbreviated SHA of the HEAD pointer for passing to other steps
+      - name: Get Abbreviated Commit SHA
+        id: short_sha
+        run: |
+          short_sha=$(git rev-parse --short HEAD)
+          echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      # I like to set the Maven project Version with a pointer to the git commit SHA that it was built from.
+      - name: Set Version
+        run: |
+          mvn versions:set -DnewVersion=${{ inputs.version }}-${{ steps.short_sha.outputs.short_sha }}
+
+      # Compile the .jar file using the JFrog CLI Maven Wrapper.
+      - name: Build Library
+        run: |
+          jf mvn clean install \
+          --build-name=${{ github.repository }} \
+          --build-number ${{ github.run_number }}
+
+      # Decorate the Build Info with some additonal metadata about the Build Environment and Git metadata
+      - name: Prepare Build Info
+        run: |
+          jf rt bag tomj-time-lib ${{ github.run_number }}
+          jf rt bce tomj-time-lib ${{ github.run_number }}
+
+      # Publish the Build to Artifactory
+      - name: Publish Build Info
+        run: |
+          jf rt bp ${{ github.repository }} ${{ github.run_number }}
+
+      # Added this for an easy-to-query property on the artifacts produced by this build
+      - name: Set Properties on Published Artifacts
+        run: |
+          jf rt set-props commit_sha=${{ github.sha }} --build ${{ github.repository }}/${{ github.run_number }}
+
+      # Create the Release Bundle
+      - name: Create Release Bundle
+        run: |
+          jf release-bundle-create \
+          --build=${{ github.repository }}/${{ github.run_number }} \
+          --signing-key=<foo>
+          ${{ github.repository }} ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}

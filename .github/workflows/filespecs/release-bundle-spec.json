@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "pattern": "tomj-time-lib-dependencies-local/*",
+      "recursive": "true"
+    }
+  ]
+}
