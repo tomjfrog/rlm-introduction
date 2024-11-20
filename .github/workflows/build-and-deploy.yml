@@ -103,7 +103,7 @@ jobs:
       - name: Create Release Bundle with REST API
         working-directory: .github/workflows
         run: |
-          create-release-bundle.sh \
+          ./create-release-bundle.sh \
           ${{ steps.setup-jfrog-cli.outputs.oidc-token}} \
           "tomj-gpg-key" \
           ${{ github.run_number }}
