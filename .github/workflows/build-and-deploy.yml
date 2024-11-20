@@ -99,6 +99,29 @@ jobs:
           --signing-key=tomj-gpg-key \
           --sync=true \
           rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
+
+      - name: Create Relasee Bundle with REST API
+        run: |
+          curl --request POST \
+          --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=phx&repository_key=phoenix-qa-release' \
+          --header 'Authorization: Bearer ${{ steps.setup-jfrog-cli.outputs.oidc-token }}' \
+          --header 'Content-Type: application/json' \
+          --header 'X-JFrog-Signing-Key-Name: tomj-gpg-key' \
+          --data '{
+          "release_bundle_name": "rlm-intro-bundle",
+          "release_bundle_version": "${{ github.run_number }}",
+          "source_type": "builds",
+          "source": {
+            "builds": [
+              {
+                "build_repository": "artifactory-build-info",
+                "build_name": "${{ github.repository }}",
+                "build_number": "${{ github.run_number }}",
+                "include_dependencies": false
+              }
+            ]
+          }
+         }'
           
       # Promote the Release Bundle to STAGE.  Note the --include-repository parameter.  This defines a scope into which
       # the Bundle's contents should be unpacked.  Without this switch, and in the absence of a JFrog Project context
