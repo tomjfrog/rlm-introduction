@@ -91,25 +91,26 @@ jobs:
           jf rt bp ${{ github.repository }} ${{ github.run_number }}
 
       # Create the Release Bundle
-#      - name: Create Release Bundle
-#        run: |
-#          jf release-bundle-create \
-#          --spec=.github/workflows/filespecs/release-bundle-spec.json \
-#          --spec-vars="BUILD=${{ github.repository }}/${{ github.run_number }}" \
-#          --signing-key=tomj-gpg-key \
-#          --sync=true \
-#          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
-
-      - name: Create Release Bundle with REST API
-        working-directory: .github/workflows
+      - name: Create Release Bundle
         run: |
-          chmod +x create-release-bundle.sh
-          ./create-release-bundle.sh \
-          ${{ steps.setup-jfrog-cli.outputs.oidc-token}} \
-          "tomj-gpg-key" \
-          ${{ github.run_number }} \
-          ${{ github.repository }} \
-          ${{ github.run_number }}
+          jf release-bundle-create \
+          --spec=.github/workflows/filespecs/release-bundle-spec.json \
+          --spec-vars="BUILD=${{ github.repository }}/${{ github.run_number }}" \
+          --signing-key=tomj-gpg-key \
+          --sync=true \
+          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
+
+#      THIS STEP IS A WORK IN PROGRESS
+#      - name: Create Release Bundle with REST API
+#        working-directory: .github/workflows
+#        run: |
+#          chmod +x create-release-bundle.sh
+#          ./create-release-bundle.sh \
+#          ${{ steps.setup-jfrog-cli.outputs.oidc-token}} \
+#          "tomj-gpg-key" \
+#          ${{ github.run_number }} \
+#          ${{ github.repository }} \
+#          ${{ github.run_number }}
           
           
       # Promote the Release Bundle to STAGE.  Note the --include-repository parameter.  This defines a scope into which
