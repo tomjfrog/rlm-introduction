@@ -1,5 +1,8 @@
 # RLM Orientation
 
+These two examples are REST API calls based of the Release Lifecycle Management Documentation located at
+https://jfrog.com/help/r/jfrog-rest-apis/release-bundle-v2-apis
+
 ## REST API EXAMPLE CALL FOR RBv2 CREATE
 ```bash
 curl --request POST \
