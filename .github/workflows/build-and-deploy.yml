@@ -91,19 +91,19 @@ jobs:
           jf rt bp ${{ github.repository }} ${{ github.run_number }}
 
       # Create the Release Bundle
-      - name: Create Release Bundle
-        run: |
-          jf release-bundle-create \
-          --spec=.github/workflows/filespecs/release-bundle-spec.json \
-          --spec-vars="BUILD=${{ github.repository }}/${{ github.run_number }}" \
-          --signing-key=tomj-gpg-key \
-          --sync=true \
-          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
+#      - name: Create Release Bundle
+#        run: |
+#          jf release-bundle-create \
+#          --spec=.github/workflows/filespecs/release-bundle-spec.json \
+#          --spec-vars="BUILD=${{ github.repository }}/${{ github.run_number }}" \
+#          --signing-key=tomj-gpg-key \
+#          --sync=true \
+#          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
 
-      - name: Create Relasee Bundle with REST API
+      - name: Create Release Bundle with REST API
         run: |
           curl --request POST \
-          --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=phx&repository_key=phoenix-qa-release' \
+          --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default' \
           --header 'Authorization: Bearer ${{ steps.setup-jfrog-cli.outputs.oidc-token }}' \
           --header 'Content-Type: application/json' \
           --header 'X-JFrog-Signing-Key-Name: tomj-gpg-key' \
@@ -133,6 +133,3 @@ jobs:
           --signing-key="tomj-gpg-key" \
           --include-repos=rlm-introduction-stage-local \
           rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }} STAGE
-          
-          
-        
