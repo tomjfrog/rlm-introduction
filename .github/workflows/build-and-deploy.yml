@@ -107,8 +107,8 @@ jobs:
           ./create-release-bundle.sh \
           ${{ steps.setup-jfrog-cli.outputs.oidc-token}} \
           "tomj-gpg-key" \
-          ${{ github.run_number }}
-          ${{ github.repository }}
+          ${{ github.run_number }} \
+          ${{ github.repository }} \
           ${{ github.run_number }}
           
           
