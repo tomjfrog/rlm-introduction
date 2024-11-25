@@ -109,7 +109,7 @@ jobs:
           --access_token ${{ steps.setup-jfrog-cli.outputs.oidc-token}} \
           --signing_key_name "tomj-gpg-key" \
           --release_bundle_version ${{ github.run_number }} \
-          --build_name ${{ github.repository }} \
+          --build_name "${{ github.repository }}" \
           --build_number ${{ github.run_number }}
           
           
