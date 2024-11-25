@@ -4,14 +4,48 @@ if [ $# -lt 2 ]; then
   exit 1
 fi
 
-# Parameters
-ACCESS_TOKEN=$1
-SIGNING_KEY_NAME=$2
-RELEASE_BUNDLE_VERSION=$3
-BUILD_NAME=$4
-BUILD_NUMBER=$5
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --access_token)
+            ACCESS_TOKEN="$2"
+            shift 2
+            ;;
+        --signing_key_name)
+            SIGNING_KEY_NAME="$2"
+            shift 2
+            ;;
+        --release_bundle_version)
+            RELEASE_BUNDLE_VERSION="$2"
+            shift 2
+            ;;
+        --build_name=$4)
+            BUILD_NAME="$2"
+            shift 2
+            ;;
+        --build_number=$4)
+            BUILD_NUMBER="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown parameter: $1"
+            exit 1
+            ;;
+    esac
+done
 
-OPTIONAL_HEADERS=$3
+
+
+
+
+
+# Parameters
+#ACCESS_TOKEN=$1
+#SIGNING_KEY_NAME=$2
+#RELEASE_BUNDLE_VERSION=$3
+#BUILD_NAME=$4
+#BUILD_NUMBER=$5
+
+#OPTIONAL_HEADERS=$3
 
 curl --request POST \
   --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default&async=true' \
