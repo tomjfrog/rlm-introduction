@@ -18,11 +18,11 @@ while [[ $# -gt 0 ]]; do
             RELEASE_BUNDLE_VERSION="$2"
             shift 2
             ;;
-        --build_name=$4)
+        --build_name)
             BUILD_NAME="$2"
             shift 2
             ;;
-        --build_number=$4)
+        --build_number)
             BUILD_NUMBER="$2"
             shift 2
             ;;
