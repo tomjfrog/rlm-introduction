@@ -1,9 +1,4 @@
 #!/bin/bash
-if [ $# -lt 5 ]; then
-  echo "Usage: $0 <URL> <OUTPUT_FILE> [OPTIONAL_HEADERS]"
-  exit 1
-fi
-
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --access_token)
@@ -32,12 +27,6 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-
-
-
-
-
-
 # Parameters
 #ACCESS_TOKEN=$1
 #SIGNING_KEY_NAME=$2
