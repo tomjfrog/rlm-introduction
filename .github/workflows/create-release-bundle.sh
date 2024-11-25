@@ -49,7 +49,7 @@ done
 
 curl --request POST \
   --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default&async=true' \
-  --header 'Authorization: BASIC $ACCESS_TOKEN' \
+  --header 'Authorization: Basic $ACCESS_TOKEN' \
   --header 'Content-Type: application/json' \
   --header 'X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME' \
   --data '{
