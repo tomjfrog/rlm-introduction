@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ $# -lt 2 ]; then
+if [ $# -lt 5 ]; then
   echo "Usage: $0 <URL> <OUTPUT_FILE> [OPTIONAL_HEADERS]"
   exit 1
 fi

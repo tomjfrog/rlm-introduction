@@ -105,14 +105,8 @@ jobs:
         working-directory: .github/workflows
         run: |
           chmod +x create-release-bundle.sh
-          ./create-release-bundle.sh \
-          --access_token ${{ secrets.BASIC_AUTH }} \
-          --signing_key_name "tomj-gpg-key" \
-          --release_bundle_version ${{ github.run_number }} \
-          --build_name "${{ github.repository }}" \
-          --build_number ${{ github.run_number }}
-          
-          
+          ./create-release-bundle.sh --access_token ${{ secrets.BASIC_AUTH }} --signing_key_name "tomj-gpg-key" --release_bundle_version ${{ github.run_number }} --build_name "${{ github.repository }}" --build_number ${{ github.run_number }}         
+
       # Promote the Release Bundle to STAGE.  Note the --include-repository parameter.  This defines a scope into which
       # the Bundle's contents should be unpacked.  Without this switch, and in the absence of a JFrog Project context
       # the promotion event will unpack the contents Globally into any repo with the "STAGE" tag.
