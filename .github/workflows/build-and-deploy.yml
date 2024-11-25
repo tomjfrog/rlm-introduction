@@ -106,7 +106,7 @@ jobs:
         run: |
           chmod +x create-release-bundle.sh
           ./create-release-bundle.sh \
-          --access_token ${{ secrets.ACCESS_TOKEN }} \
+          --access_token ${{ secrets.BASIC_AUTH }} \
           --signing_key_name "tomj-gpg-key" \
           --release_bundle_version ${{ github.run_number }} \
           --build_name "${{ github.repository }}" \
