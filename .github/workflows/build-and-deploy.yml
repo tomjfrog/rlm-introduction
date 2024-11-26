@@ -20,8 +20,11 @@ jobs:
     env:
       ECU1_BUILD_NAME: 'ecu1-build'
       ECU2_BUILD_NAME: 'ecu2-build'
-      ECU1_BUNLDE_NAME: 'ecu1-bundle'
-      ECU2_BUNLDE_NAME: 'ecu2-bundle'
+      ECU1_BUNDLE_NAME: 'ecu1-bundle'
+      ECU2_BUNDLE_NAME: 'ecu2-bundle'
+      GPG_KEY_NAME: 'tomj-gpg-key'
+      ECU1_QA_REPO: 'ecu1-maven-qa-local'
+      ECU2_QA_REPO: 'ecu1-maven-qa-local'
     steps:
       # Checkout the repository code
       - name: Checkout specific commit
@@ -100,22 +103,14 @@ jobs:
           mvn versions:set -DnewVersion=${{ inputs.version }}-${{ steps.short_sha.outputs.short_sha }}
 
       # Compile the .jar file using the JFrog CLI Maven Wrapper.
-      - name: Build Library
+      - name: Build ECU1
         working-directory: app1
         run: |
           jf mvn clean install \
           --build-name=${{ env.ECU1_BUILD_NAME }} \
           --build-number ${{ github.run_number }}
 
-      # Compile the .jar file using the JFrog CLI Maven Wrapper.
-      - name: Build ECU1
-        working-directory: app2
-        run: |
-          jf mvn clean install \
-          --build-name=${{ env.ECU2_BUILD_NAME }} \
-          --build-number ${{ github.run_number }}
-
-      # Decorate the Build Info with some additonal metadata about the Build Environment and Git metadata
+      # Decorate the Build Info with some additional metadata about the Build Environment and Git metadata
       - name: Prepare Build Info for ECU1 Build
         working-directory: app1
         run: |
@@ -136,16 +131,16 @@ jobs:
           --build-name=${{ env.ECU2_BUILD_NAME }} \
           --build-number ${{ github.run_number }}
 
-      # Decorate the Build Info with some additonal metadata about the Build Environment and Git metadata
+      # Decorate the Build Info with some additional metadata about the Build Environment and Git metadata
       - name: Prepare Build Info for ECU2 Build
-        working-directory: app1
+        working-directory: app2
         run: |
           jf rt bag ${{ env.ECU2_BUILD_NAME }} ${{ github.run_number }}
           jf rt bce ${{ env.ECU2_BUILD_NAME }} ${{ github.run_number }}
 
       # Publish the Build to Artifactory
-      - name: Publish Build Info for ECU1 Build
-        working-directory: app1
+      - name: Publish Build Info for ECU2 Build
+        working-directory: app2
         run: |
           jf rt bp ${{ env.ECU2_BUILD_NAME }} ${{ github.run_number }}
 
@@ -169,18 +164,29 @@ jobs:
 #      BUILD_NAME=$5
 #      BUILD_NUMBER=$6
 
-      - name: Create Release Bundle with REST API
+      - name: Create Release Bundle with REST API for ECU1
         working-directory: .github/workflows
         run: |
           chmod +x create-release-bundle.sh
           ./create-release-bundle.sh \
           ${{ secrets.CURL_BASIC_AUTH }} \
-          "tomj-gpg-key" \
-          "ecu1-bundle" \
+          ${{ env.GPG_KEY_NAME }} \
+          ${{ env.ECU1_BUNDLE_NAME }} \
           ${{ github.run_number }} \
           "${{ env.ECU1_BUILD_NAME }}" \
           ${{ github.run_number }}
-          
+
+      - name: Create Release Bundle with REST API for ECU2
+        working-directory: .github/workflows
+        run: |
+          chmod +x create-release-bundle.sh
+          ./create-release-bundle.sh \
+          ${{ secrets.CURL_BASIC_AUTH }} \
+          ${{ env.GPG_KEY_NAME }} \
+          ${{ env.ECU2_BUNDLE_NAME }} \
+          ${{ github.run_number }} \
+          "${{ env.ECU2_BUILD_NAME }}" \
+          ${{ github.run_number }}          
           
       # Promote the Release Bundle to STAGE.  Note the --include-repository parameter.  This defines a scope into which
       # the Bundle's contents should be unpacked.  Without this switch, and in the absence of a JFrog Project context
@@ -194,22 +200,43 @@ jobs:
 #          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }} STAGE
 
        # Parameters and their positions
-#      RT_TOKEN=$1
-#      SIGNING_KEY_NAME=$2
-#      BUNDLE_NAME=$3
-#      BUNDLE_VERSION=$4
-#      ENVIRONMENT=$5
-#      INCLUDED_REPOSITORY_KEYS=$6
-#      OVERWRITE_EXISTING_ARTIFACTS=$7
-      - name: Promote Release Bundle to Stage with REST API
+       # RT_TOKEN=$1
+       # SIGNING_KEY_NAME=$2
+       # BUNDLE_NAME=$3
+       # BUNDLE_VERSION=$4
+       # ENVIRONMENT=$5
+       # INCLUDED_REPOSITORY_KEYS=$6
+       # OVERWRITE_EXISTING_ARTIFACTS=$7
+      - name: Promote Release Bundle to Stage with REST API for ECU1
         working-directory: .github/workflows
         run: |
           chmod +x promote-release-bundle.sh
           ./promote-release-bundle.sh \
           ${{ secrets.CURL_BASIC_AUTH }} \
-          "tomj-gpg-key" \
-          "ecu1-bundle" \
+          ${{ env.GPG_KEY_NAME }} \
+          ${{ env.ECU1_BUNDLE_NAME }} \
           ${{ github.run_number }} \
           "QA" \
-          "ecu1-maven-qa-local" \
+          ${{ env.ECU1_QA_REPO }} \
+          false
+
+      # Parameters and their positions
+      #      RT_TOKEN=$1
+      #      SIGNING_KEY_NAME=$2
+      #      BUNDLE_NAME=$3
+      #      BUNDLE_VERSION=$4
+      #      ENVIRONMENT=$5
+      #      INCLUDED_REPOSITORY_KEYS=$6
+      #      OVERWRITE_EXISTING_ARTIFACTS=$7
+      - name: Promote Release Bundle to Stage with REST API for ECU2
+        working-directory: .github/workflows
+        run: |
+          chmod +x promote-release-bundle.sh
+          ./promote-release-bundle.sh \
+          ${{ secrets.CURL_BASIC_AUTH }} \
+          ${{ env.GPG_KEY_NAME }} \
+          ${{ env.ECU2_BUNDLE_NAME }} \
+          ${{ github.run_number }} \
+          "QA" \
+          ${{ env.ECU2_QA_REPO }} \
           false
