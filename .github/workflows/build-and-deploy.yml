@@ -117,7 +117,7 @@ jobs:
         run: |
           chmod +x create-release-bundle.sh
           ./create-release-bundle.sh \
-          ${{ secrets.AUTH_TOKEN }} \
+          foo \
           "tomj-gpg-key" \
           "ecu1-bundle" \
           ${{ github.run_number }} \
