@@ -1,38 +1,16 @@
 #!/bin/bash
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --access_token)
-            ACCESS_TOKEN="$2"
-            shift 2
-            ;;
-        --signing_key_name)
-            SIGNING_KEY_NAME="$2"
-            shift 2
-            ;;
-        --release_bundle_version)
-            RELEASE_BUNDLE_VERSION="$2"
-            shift 2
-            ;;
-        --build_name)
-            BUILD_NAME="$2"
-            shift 2
-            ;;
-        --build_number)
-            BUILD_NUMBER="$2"
-            shift 2
-            ;;
-        *)
-            echo "Unknown parameter: $1"
-            exit 1
-            ;;
-    esac
-done
+if [ $# -lt 2 ]; then
+  echo "Usage: $0 <ACCESS_TOKEN> <SIGNING_KEY_NAME> <RELEASE_BUNDLE_VERSION> <BUILD_NAME> <BUILD_NUMBER>"
+  exit 1
+fi
+
 # Parameters
-#ACCESS_TOKEN=$1
-#SIGNING_KEY_NAME=$2
-#RELEASE_BUNDLE_VERSION=$3
-#BUILD_NAME=$4
-#BUILD_NUMBER=$5
+ACCESS_TOKEN=$1
+SIGNING_KEY_NAME=$2
+RELEASE_BUNDLE_NAME=$3
+RELEASE_BUNDLE_VERSION=$4
+BUILD_NAME=$5
+BUILD_NUMBER=$6
 
 #OPTIONAL_HEADERS=$3
 
@@ -42,7 +20,7 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --header 'X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME' \
   --data '{
-    "release_bundle_name": "rlm-intro-bundle",
+    "release_bundle_name": "$RELEASE_BUNDLE_NAME",
     "release_bundle_version": "$RELEASE_BUNDLE_VERSION",
     "source_type": "builds",
     "source": {

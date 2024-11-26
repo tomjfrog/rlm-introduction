@@ -100,16 +100,25 @@ jobs:
 #          --sync=true \
 #          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }}
 
-#      THIS STEP IS A WORK IN PROGRESS
+       # Named parameters a little messy in a Bash script.  These are the positional parameters the
+       # Bash script is expecting in this order:
+#      ACCESS_TOKEN=$1
+#      SIGNING_KEY_NAME=$2
+#      RELEASE_BUNDLE_NAME=$3
+#      RELEASE_BUNDLE_VERSION=$4
+#      BUILD_NAME=$5
+#      BUILD_NUMBER=$6
+
       - name: Create Release Bundle with REST API
         working-directory: .github/workflows
         run: |
           chmod +x create-release-bundle.sh
           ./create-release-bundle.sh \
-          ${{ steps.setup-jfrog-cli.outputs.oidc-token}} \
+          ${{ secrets.BASIC_AUTH }} \
           "tomj-gpg-key" \
+          "ecu1-bundle"
           ${{ github.run_number }}
-          ${{ github.repository }}
+          "${{ github.repository }}"
           ${{ github.run_number }}
           
           
