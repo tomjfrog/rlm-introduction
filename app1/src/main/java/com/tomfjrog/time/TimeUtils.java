@@ -12,6 +12,10 @@ public class TimeUtils {
         return currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"));
     }
 
+    public static String getAppName() {
+        return "I'm ECU_1";
+    }
+
     // Function to return the current system time in a given time zone
     public static String getCurrentTimeInTimeZone(String timeZone) {
         try {

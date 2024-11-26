@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tomfjrog.time</groupId>
-    <artifactId>rlm-maven-project</artifactId>
+    <artifactId>ecu_1</artifactId>
     <version>0.0-DEFAULT</version>
 
     <properties>

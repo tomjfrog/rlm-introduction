@@ -17,7 +17,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      ECU1_BUILD_NAME: 'ecu1-build'
+      ECU2_BUILD_NAME: 'ecu2-build'
+      ECU1_BUNLDE_NAME: 'ecu1-bundle'
+      ECU2_BUNLDE_NAME: 'ecu2-bundle'
     steps:
       # Checkout the repository code
       - name: Checkout specific commit
@@ -52,16 +56,30 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Configure Maven
+      - name: Configure Maven for ECU1
         shell: bash
+        working-directory: app1
         run: |
           jf mvnc \
           --server-id-resolve=setup-jfrog-cli-server \
           --server-id-deploy=setup-jfrog-cli-server \
           --repo-resolve-releases=mavencentral-remote \
           --repo-resolve-snapshots=mavencentral-remote \
-          --repo-deploy-releases=rlm-introduction-devl-local \
-          --repo-deploy-snapshots=rlm-introduction-devl-local
+          --repo-deploy-releases=ecu1-maven-dev-local \
+          --repo-deploy-snapshots=ecu1-maven-dev-local
+
+      - name: Configure Maven for ECU2
+        shell: bash
+        working-directory: app2
+        run: |
+          jf mvnc \
+          --server-id-resolve=setup-jfrog-cli-server \
+          --server-id-deploy=setup-jfrog-cli-server \
+          --repo-resolve-releases=mavencentral-remote \
+          --repo-resolve-snapshots=mavencentral-remote \
+          --repo-deploy-releases=ecu2-maven-dev-local \
+          --repo-deploy-snapshots=ecu2-maven-dev-local
+     
 
       # Fetch the abbreviated SHA of the HEAD pointer for passing to other steps
       - name: Get Abbreviated Commit SHA
@@ -72,26 +90,65 @@ jobs:
 
       # I like to set the Maven project Version with a pointer to the git commit SHA that it was built from.
       - name: Set Version
+        working-directory: app1
+        run: |
+          mvn versions:set -DnewVersion=${{ inputs.version }}-${{ steps.short_sha.outputs.short_sha }}
+
+      - name: Set Version
+        working-directory: app2
         run: |
           mvn versions:set -DnewVersion=${{ inputs.version }}-${{ steps.short_sha.outputs.short_sha }}
 
       # Compile the .jar file using the JFrog CLI Maven Wrapper.
       - name: Build Library
+        working-directory: app1
         run: |
           jf mvn clean install \
-          --build-name=${{ github.repository }} \
+          --build-name=${{ env.ECU1_BUILD_NAME }} \
+          --build-number ${{ github.run_number }}
+
+      # Compile the .jar file using the JFrog CLI Maven Wrapper.
+      - name: Build ECU1
+        working-directory: app2
+        run: |
+          jf mvn clean install \
+          --build-name=${{ env.ECU2_BUILD_NAME }} \
           --build-number ${{ github.run_number }}
 
       # Decorate the Build Info with some additonal metadata about the Build Environment and Git metadata
-      - name: Prepare Build Info
+      - name: Prepare Build Info for ECU1 Build
+        working-directory: app1
         run: |
-          jf rt bag tomj-time-lib ${{ github.run_number }}
-          jf rt bce tomj-time-lib ${{ github.run_number }}
+          jf rt bag ${{ env.ECU1_BUILD_NAME }} ${{ github.run_number }}
+          jf rt bce ${{ env.ECU1_BUILD_NAME }} ${{ github.run_number }}
 
       # Publish the Build to Artifactory
-      - name: Publish Build Info
+      - name: Publish Build Info for ECU1 Build
+        working-directory: app1
         run: |
-          jf rt bp ${{ github.repository }} ${{ github.run_number }}
+          jf rt bp ${{ env.ECU1_BUILD_NAME }} ${{ github.run_number }}
+
+      # Compile the .jar file using the JFrog CLI Maven Wrapper.
+      - name: Build ECU2
+        working-directory: app2
+        run: |
+          jf mvn clean install \
+          --build-name=${{ env.ECU2_BUILD_NAME }} \
+          --build-number ${{ github.run_number }}
+
+      # Decorate the Build Info with some additonal metadata about the Build Environment and Git metadata
+      - name: Prepare Build Info for ECU2 Build
+        working-directory: app1
+        run: |
+          jf rt bag ${{ env.ECU2_BUILD_NAME }} ${{ github.run_number }}
+          jf rt bce ${{ env.ECU2_BUILD_NAME }} ${{ github.run_number }}
+
+      # Publish the Build to Artifactory
+      - name: Publish Build Info for ECU1 Build
+        working-directory: app1
+        run: |
+          jf rt bp ${{ env.ECU2_BUILD_NAME }} ${{ github.run_number }}
+
 
       # Create the Release Bundle
 #      - name: Create Release Bundle
@@ -121,7 +178,7 @@ jobs:
           "tomj-gpg-key" \
           "ecu1-bundle" \
           ${{ github.run_number }} \
-          "${{ github.repository }}" \
+          "${{ env.ECU1_BUILD_NAME }}" \
           ${{ github.run_number }}
           
           
@@ -154,5 +211,5 @@ jobs:
           "ecu1-bundle" \
           ${{ github.run_number }} \
           "QA" \
-          "rlm-orientation-maven-qa-local" \
+          "ecu1-maven-qa-local" \
           false
