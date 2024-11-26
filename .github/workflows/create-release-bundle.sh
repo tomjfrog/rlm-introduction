@@ -12,6 +12,14 @@ RELEASE_BUNDLE_VERSION=$4
 BUILD_NAME=$5
 BUILD_NUMBER=$6
 
+# Tshooting
+
+echo $SIGNING_KEY_NAME
+echo RELEASE_BUNDLE_NAME
+echo RELEASE_BUNDLE_VERSION
+echo BUILD_NAME
+echo BUILD_NUMBER
+
 curl --request POST \
   --user $RT_TOKEN \
   --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default&async=true' \
