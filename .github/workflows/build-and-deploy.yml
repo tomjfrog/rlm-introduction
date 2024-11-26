@@ -135,3 +135,24 @@ jobs:
 #          --signing-key="tomj-gpg-key" \
 #          --include-repos=rlm-introduction-stage-local \
 #          rlm-intro-bundle ${{ github.run_number }}-${{ steps.short_sha.outputs.short_sha }} STAGE
+
+       # Parameters and their positions
+#      RT_TOKEN=$1
+#      SIGNING_KEY_NAME=$2
+#      BUNDLE_NAME=$3
+#      BUNDLE_VERSION=$4
+#      ENVIRONMENT=$5
+#      INCLUDED_REPOSITORY_KEYS=$6
+#      OVERWRITE_EXISTING_ARTIFACTS=$7
+      - name: Promote Release Bundle to Stage with REST API
+        working-directory: .github/workflows
+        run: |
+          chmod +x promote-release-bundle.sh
+          ./promote-release-bundle.sh
+          ${{ secrets.CURL_BASIC_AUTH }} \
+          "tomj-gpg-key" \
+          "ecu1-bundle" \
+          ${{ github.run_number }} \
+          "QA" \
+          "rlm-orientation-maven-qa-local" \
+          false
