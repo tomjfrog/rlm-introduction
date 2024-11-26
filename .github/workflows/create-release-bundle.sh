@@ -21,22 +21,25 @@ echo $BUILD_NAME
 echo $BUILD_NUMBER
 
 payload=$(cat <<EOF
-"release_bundle_name": "$RELEASE_BUNDLE_NAME",
-    "release_bundle_version": "$RELEASE_BUNDLE_VERSION",
-    "source_type": "builds",
-    "source": {
-        "builds": [
-            {
-                "build_repository": "artifactory-build-info",
-                "build_name": "$BUILD_NAME",
-                "build_number": "$BUILD_NUMBER",
-                "include_dependencies": false
-            }
-        ]
-    }
+{
+  "release_bundle_name": "$RELEASE_BUNDLE_NAME",
+  "release_bundle_version": "$RELEASE_BUNDLE_VERSION",
+  "source_type": "builds",
+  "source": {
+      "builds": [
+          {
+              "build_repository": "artifactory-build-info",
+              "build_name": "$BUILD_NAME",
+              "build_number": "$BUILD_NUMBER",
+              "include_dependencies": false
+          }
+      ]
+  }
+}
+EOF
 )
 
-curl -v --request POST \
+curl --request POST \
   --user $RT_TOKEN \
   --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default&async=true' \
   --header "Content-Type: application/json" \
