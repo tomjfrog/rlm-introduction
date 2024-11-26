@@ -13,8 +13,8 @@ BUILD_NAME=$5
 BUILD_NUMBER=$6
 
 curl --request POST \
+  --user $RT_TOKEN
   --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default&async=true' \
-  --header 'Authorization: Bearer $JF_ACCESS_TOKEN' \
   --header 'Content-Type: application/json' \
   --header 'X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME' \
   --data '{
