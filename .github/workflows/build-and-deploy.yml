@@ -10,6 +10,9 @@ on:
         description: 'Library SemVer'
         required: true
         default: '0.0.0'
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -116,9 +119,9 @@ jobs:
           ./create-release-bundle.sh \
           ${{ secrets.BASIC_AUTH }} \
           "tomj-gpg-key" \
-          "ecu1-bundle"
-          ${{ github.run_number }}
-          "${{ github.repository }}"
+          "ecu1-bundle" \
+          ${{ github.run_number }} \
+          "${{ github.repository }}" \
           ${{ github.run_number }}
           
           
