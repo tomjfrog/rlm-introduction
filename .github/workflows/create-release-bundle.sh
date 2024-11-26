@@ -20,13 +20,8 @@ echo $RELEASE_BUNDLE_VERSION
 echo $BUILD_NAME
 echo $BUILD_NUMBER
 
-curl --request POST \
-  --user $RT_TOKEN \
-  --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default&async=true' \
-  --header 'Content-Type: application/json' \
-  --header 'X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME' \
-  --data '{
-    "release_bundle_name": "$RELEASE_BUNDLE_NAME",
+payload=$(cat <<EOF
+"release_bundle_name": "$RELEASE_BUNDLE_NAME",
     "release_bundle_version": "$RELEASE_BUNDLE_VERSION",
     "source_type": "builds",
     "source": {
@@ -39,5 +34,11 @@ curl --request POST \
             }
         ]
     }
-}
-'
+)
+
+curl -v --request POST \
+  --user $RT_TOKEN \
+  --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?project=default&async=true' \
+  --header "Content-Type: application/json" \
+  --header "X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME" \
+  --data "$payload"
