@@ -1,5 +1,5 @@
 if [ $# -lt 7 ]; then
-  echo "Usage: $0 <RT_TOKEN> <SIGNING_KEY_NAME> <BUNDLE_NAME> <BUNDLE_VERSION> <ENVIRONMENT> <INCLUDED_REPOSITORY_KEYS> OVERWRITE_EXISTING_ARTIFACTS"
+  echo "Usage: $0 <RT_TOKEN> <SIGNING_KEY_NAME> <BUNDLE_NAME> <BUNDLE_VERSION> <ENVIRONMENT> <INCLUDED_REPOSITORY_KEYS> <OVERWRITE_EXISTING_ARTIFACTS>"
   exit 1
 fi
 
@@ -20,17 +20,18 @@ echo $ENVIRONMENT
 echo $INCLUDED_REPOSITORY_KEYS
 echo $OVERWRITE_EXISTING_ARTIFACTS
 
-
-payload=$(cat EOF
-  {
-  	"environment": "QA",
-  	"included_repository_keys": [
-  		$INCLUDED_REPOSITORY_KEYS
-  	],
-  	"overwrite_existing_artifacts": $OVERWRITE_EXISTING_ARTIFACTS
-  }
+payload=$(cat <<EOF
+{
+  "environment": "$ENVIRONMENT",
+  "included_repository_keys": [
+    "$INCLUDED_REPOSITORY_KEYS"
+  ],
+  "overwrite_existing_artifacts": "$OVERWRITE_EXISTING_ARTIFACTS"
+}
 EOF
 )
+
+echo $payload
 
 curl --request POST \
   --user $RT_TOKEN \

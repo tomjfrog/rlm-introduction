@@ -148,7 +148,7 @@ jobs:
         working-directory: .github/workflows
         run: |
           chmod +x promote-release-bundle.sh
-          ./promote-release-bundle.sh
+          ./promote-release-bundle.sh \
           ${{ secrets.CURL_BASIC_AUTH }} \
           "tomj-gpg-key" \
           "ecu1-bundle" \
