@@ -2,7 +2,7 @@
 
 # The intended use-case for this API call is to find the latest Promotion
 # of a named Release Bundle, with some filtering to get a single promotion that meets our criteria
-
+# It returns the RB version that was last promoted successfully to $SOURCE_ENVIRONMENT
 
 if [ $# -lt 4 ]; then
   echo "Usage: $0 <RT_TOKEN> <SIGNING_KEY_NAME> <BUNDLE_NAME> <SOURCE_ENVIRONMENT>"
@@ -23,5 +23,5 @@ curl --request GET \
   --user $RT_TOKEN \
   --url "https://tomjfrog.jfrog.io/lifecycle/api/v2/promotion/records/$BUNDLE_NAME?$query_params" \
   --header "X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME" | \
-jq -c '.promotions | map(select(.status == "COMPLETED")) | .[0]'
+jq -c '.promotions | map(select(.status == "COMPLETED")) | .[0].release_bundle_version'
 

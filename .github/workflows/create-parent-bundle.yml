@@ -8,10 +8,10 @@ on:
     inputs:
       ecu1-release-bundle-version:
         description: 'The Version of the ECU1 Bundle to Include'
-        required: true
+        required: false
       ecu2-release-bundle-version:
         description: 'The Version of the ECU2 Bundle to Include'
-        required: true
+        required: false
 
 jobs:
   build:
@@ -50,8 +50,18 @@ jobs:
 
       - name: Find Latest ECU1 Bundle Promotion to QA
         id: ecu1-latest-rb
+        working-directory: .github/workflows
         run: |
-          echo 'foo'
+          chmod +x find-latest-promotion-to-env.sh
+          LATEST_VERSION=$(./find-latest-promotion-to-env.sh \
+          ${{ secrets.CURL_BASIC_AUTH }} \
+          ${{ env.GPG_KEY_NAME }} \
+          ${{ env.ECU1_BUNDLE_NAME }} \
+          "QA") >> $GITHUB_OUTPUT
+
+      - name: Validate ECU1 Latest Bundle
+        run: |
+          echo ${{ steps.ecu1-latest-rb.outputs.LATEST_VERSION }}
 
       - name: Find Latest ECU2 Bundle Promotion to QA
         id: ecu2-latest-rb
