@@ -23,7 +23,7 @@ jobs:
       ECU2_BUNDLE_NAME: 'ecu2-bundle'
       GPG_KEY_NAME: 'tomj-gpg-key'
       ECU1_QA_REPO: 'ecu1-maven-qa-local'
-      ECU2_QA_REPO: 'ecu1-maven-qa-local'
+      ECU2_QA_REPO: 'ecu2-maven-qa-local'
     steps:
       # Checkout the repository code
       - name: Checkout specific commit
