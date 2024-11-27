@@ -22,17 +22,13 @@ payload=$(cat <<EOF
   "source": {
       "release_bundles": [
           {
-              "project_key": "default",
-              "repository_key": "release-bundles-v2",
               "release_bundle_name": "$EC1_BUNDLE_NAME",
-              "release_bundle_number": "$EC1_BUNDLE_VERSION",
+              "release_bundle_version": "$EC1_BUNDLE_VERSION",
               "include_dependencies": false
           },
           {
-              "project_key": "default",
-              "repository_key": "release-bundles-v2",
               "release_bundle_name": "$EC2_BUNDLE_NAME",
-              "release_bundle_number": "$EC2_BUNDLE_VERSION",
+              "release_bundle_version": "$EC2_BUNDLE_VERSION",
               "include_dependencies": false
           }
       ]
