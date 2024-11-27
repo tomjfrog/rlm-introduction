@@ -65,6 +65,7 @@ jobs:
 
       - name: Find Latest ECU2 Bundle Promotion to QA
         id: ecu2-latest-rb
+        working-directory: .github/workflows
         run: |
           chmod +x find-latest-promotion-to-env.sh
           { 
