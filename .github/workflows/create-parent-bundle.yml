@@ -58,7 +58,7 @@ jobs:
           ${{ env.GPG_KEY_NAME }} \
           ${{ env.ECU1_BUNDLE_NAME }} \
           "QA")"
-          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "LATEST_VERSION=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Validate ECU1 Latest Bundle
         run: |
