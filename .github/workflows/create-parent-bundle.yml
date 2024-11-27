@@ -80,8 +80,18 @@ jobs:
 
       - name: Create Parent Release Bundle from Child Bundles
         id: create-parent-bundle
+        working-directory: .github/workflows
         run: |
-          echo 'foo'
+          chmod +x create-parent-bundle-from-children.sh
+          ./create-parent-bundle-from-children.sh \
+          ${{ secrets.CURL_BASIC_AUTH }} \
+          ${{ env.GPG_KEY_NAME }} \
+          "parent-bundle" \
+          ${{ github.run_number }} \
+          ${{ env.ECU1_BUILD_NAME }} \
+          ${{ steps.ecu1-latest-rb.outputs.LATEST_VERSION }} \
+          ${{ env.ECU2_BUILD_NAME }} \
+          ${{ steps.ecu2-latest-rb.outputs.LATEST_VERSION }}
 
       - name: Promote Parent Bundle to Production
         id: promote-parent-prod
