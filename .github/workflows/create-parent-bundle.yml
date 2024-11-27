@@ -53,11 +53,12 @@ jobs:
         working-directory: .github/workflows
         run: |
           chmod +x find-latest-promotion-to-env.sh
-          echo "LATEST_VERSION=$(./find-latest-promotion-to-env.sh \
+          LATEST_VERSION=$(./find-latest-promotion-to-env.sh \
           ${{ secrets.CURL_BASIC_AUTH }} \
           ${{ env.GPG_KEY_NAME }} \
           ${{ env.ECU1_BUNDLE_NAME }} \
-          "QA")" >> $GITHUB_OUTPUT
+          "QA")
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
       - name: Validate ECU1 Latest Bundle
         run: |
