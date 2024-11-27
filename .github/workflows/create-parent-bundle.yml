@@ -105,5 +105,5 @@ jobs:
           "parent-bundle" \
           ${{ github.run_number }} \
           "PROD" \
-          "${{ env.INTEGRATION_PROD_REPO }} \
+          ${{ env.INTEGRATION_PROD_REPO }} \
           false
