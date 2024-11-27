@@ -10,9 +10,9 @@ on:
         description: 'Library SemVer'
         required: true
         default: '0.0.0'
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
 
 jobs:
   build:

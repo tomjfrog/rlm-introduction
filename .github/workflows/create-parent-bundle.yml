@@ -1,4 +1,4 @@
-name: Build, Publish, Bundle, Promote
+name: Create Parent Bundle
 
 permissions:
   id-token: write
