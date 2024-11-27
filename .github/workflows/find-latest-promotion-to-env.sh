@@ -16,9 +16,6 @@ SOURCE_ENVIRONMENT=$4
 
 query_params="filter_by=$SOURCE_ENVIRONMENT&order_by=created_millis"
 
-
-echo $query_params
-
 curl --request GET \
   --user $RT_TOKEN \
   --url "https://tomjfrog.jfrog.io/lifecycle/api/v2/promotion/records/$BUNDLE_NAME?$query_params" \
