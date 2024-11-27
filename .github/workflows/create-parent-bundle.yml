@@ -14,7 +14,7 @@ on:
         required: false
 
 jobs:
-  build:
+  create-parent-bundle:
     runs-on: ubuntu-latest
     env:
       ECU1_BUILD_NAME: 'ecu1-build'
@@ -58,6 +58,7 @@ jobs:
           ${{ env.GPG_KEY_NAME }} \
           ${{ env.ECU1_BUNDLE_NAME }} \
           "QA")"
+          echo "$LATEST_VERSION"
           echo "LATEST_VERSION=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Validate ECU1 Latest Bundle
