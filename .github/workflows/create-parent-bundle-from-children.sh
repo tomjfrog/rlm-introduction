@@ -39,11 +39,10 @@ payload=$(cat <<EOF
 }
 EOF
 )
-echo $payload
 
-echo "curl --request POST \
+curl --request POST \
   --user $RT_TOKEN \
   --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?async=false' \
   --header "Content-Type: application/json" \
   --header "X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME" \
-  --data "$payload""
+  --data "$payload"
