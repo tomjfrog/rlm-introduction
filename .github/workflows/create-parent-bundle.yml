@@ -88,9 +88,9 @@ jobs:
           ${{ env.GPG_KEY_NAME }} \
           "parent-bundle" \
           ${{ github.run_number }} \
-          ${{ env.ECU1_BUILD_NAME }} \
+          ${{ env.ECU1_BUNDLE_NAME }} \
           ${{ steps.ecu1-latest-rb.outputs.LATEST_VERSION }} \
-          ${{ env.ECU2_BUILD_NAME }} \
+          ${{ env.ECU2_BUNDLE_NAME }} \
           ${{ steps.ecu2-latest-rb.outputs.LATEST_VERSION }}
 
       - name: Promote Parent Bundle to Production

@@ -9,28 +9,29 @@ RT_TOKEN=$1
 SIGNING_KEY_NAME=$2
 RELEASE_BUNDLE_NAME=$3
 RELEASE_BUNDLE_VERSION=$4
-EC1_BUILD_NAME=$5
-EC2_BUILD_NAME=$6
-EC1_BUILD_NUMBER=$7
-EC2_BUILD_NUMBER=$8
+EC1_BUNDLE_NAME=$5
+EC2_BUNDLE_NAME=$6
+EC1_BUNDLE_VERSION=$7
+EC2_BUNDLE_VERSION=$8
 
 payload=$(cat <<EOF
 {
   "release_bundle_name": "$RELEASE_BUNDLE_NAME",
   "release_bundle_version": "$RELEASE_BUNDLE_VERSION",
-  "source_type": "builds",
+  "source_type": "release_bundles",
   "source": {
-      "builds": [
+      "release_bundles": [
           {
-              "build_repository": "artifactory-build-info",
-              "build_name": "$EC1_BUILD_NAME",
-              "build_number": "$EC1_BUILD_NUMBER",
+              "project_key": "default",
+              "repository_key": "release-bundles-v2",
+              "release_bundle_name": "$EC1_BUNDLE_NAME",
+              "release_bundle_number": "$EC1_BUNDLE_VERSION",
               "include_dependencies": false
           },
           {
               "build_repository": "artifactory-build-info",
-              "build_name": "$EC2_BUILD_NAME",
-              "build_number": "$EC2_BUILD_NUMBER",
+              "build_name": "$EC2_BUNDLE_NAME",
+              "build_number": "$EC2_BUNDLE_VERSION",
               "include_dependencies": false
           }
       ]
