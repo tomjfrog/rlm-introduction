@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ $# -lt 7 ]; then
   echo "Usage: $0 <RT_TOKEN> <SIGNING_KEY_NAME> <BUNDLE_NAME> <BUNDLE_VERSION> <ENVIRONMENT> <INCLUDED_REPOSITORY_KEYS> <OVERWRITE_EXISTING_ARTIFACTS>"
   exit 1
@@ -30,8 +32,6 @@ payload=$(cat <<EOF
 }
 EOF
 )
-
-echo $payload
 
 curl --request POST \
   --user $RT_TOKEN \
