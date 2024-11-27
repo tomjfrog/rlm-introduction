@@ -24,6 +24,7 @@ jobs:
       GPG_KEY_NAME: 'tomj-gpg-key'
       ECU1_QA_REPO: 'ecu1-maven-qa-local'
       ECU2_QA_REPO: 'ecu2-maven-qa-local'
+      INTEGRATION_PROD_REPO: 'ecu-parent-integration-local'
     steps:
       # Checkout the repository code
       - name: Checkout specific commit
@@ -95,5 +96,14 @@ jobs:
 
       - name: Promote Parent Bundle to Production
         id: promote-parent-prod
+        working-directory: .github/workflows
         run: |
-          echo 'foo'
+          chmod +x promote-release-bundle.sh
+          ./promote-release-bundle.sh \
+          ${{ secrets.CURL_BASIC_AUTH }} \
+          ${{ env.GPG_KEY_NAME }} \
+          "parent-bundle" \
+          ${{ github.run_number }} \
+          "PROD" \
+          "${{ env.INTEGRATION_PROD_REPO }} \
+          false
