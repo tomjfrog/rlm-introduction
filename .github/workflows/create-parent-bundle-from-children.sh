@@ -29,9 +29,10 @@ payload=$(cat <<EOF
               "include_dependencies": false
           },
           {
-              "build_repository": "artifactory-build-info",
-              "build_name": "$EC2_BUNDLE_NAME",
-              "build_number": "$EC2_BUNDLE_VERSION",
+              "project_key": "default",
+              "repository_key": "release-bundles-v2",
+              "release_bundle_name": "$EC2_BUNDLE_NAME",
+              "release_bundle_number": "$EC2_BUNDLE_VERSION",
               "include_dependencies": false
           }
       ]
