@@ -10,8 +10,8 @@ SIGNING_KEY_NAME=$2
 RELEASE_BUNDLE_NAME=$3
 RELEASE_BUNDLE_VERSION=$4
 EC1_BUNDLE_NAME=$5
-EC2_BUNDLE_NAME=$6
-EC1_BUNDLE_VERSION=$7
+EC1_BUNDLE_VERSION=$6
+EC2_BUNDLE_NAME=$7
 EC2_BUNDLE_VERSION=$8
 
 payload=$(cat <<EOF
@@ -39,10 +39,11 @@ payload=$(cat <<EOF
 }
 EOF
 )
+echo $payload
 
-curl --request POST \
+echo "curl --request POST \
   --user $RT_TOKEN \
   --url 'https://tomjfrog.jfrog.io/lifecycle/api/v2/release_bundle?async=false' \
   --header "Content-Type: application/json" \
   --header "X-JFrog-Signing-Key-Name: $SIGNING_KEY_NAME" \
-  --data "$payload"
+  --data "$payload""
